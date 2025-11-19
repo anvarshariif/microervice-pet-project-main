@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: product
+
+  liquibase:
+    change-log: classpath:liquibase/master.xml
+    enabled: true
+    drop-first: false
+    default-schema: public
+    liquibase-schema: public
+  datasource:
+    url: jdbc:postgresql://localhost:5432/product_db
+    username: postgres
+    password: root123
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    # File Upload Configuration
+    servlet:
+      multipart:
+        enabled: true
+        max-file-size: 10MB
+        max-request-size: 10MB
+        file-size-threshold: 2MB
+
+server:
+  port: 8081
+
+logging:
+  level:
+    liquibase: DEBUG
+    org.hibernate.SQL: DEBUG
+
+minio:
+  url: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket-name: product-images

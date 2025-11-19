@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+  <changeSet id="202511191046-2" author="anvar">
+    <sql>
+      -- Eski products jadvalini backup qilish
+      CREATE TABLE products_backup AS
+      SELECT *
+      FROM products;
+
+      -- Eski jadval nomini o'zgartirish
+      ALTER TABLE products RENAME TO products_old;
+
+      -- Partition qilingan yangi jadval yaratish
+      CREATE TABLE products
+      (
+        id          BIGINT         NOT NULL,
+        name        VARCHAR(255)   NOT NULL,
+        price       DECIMAL(19, 2) NOT NULL,
+        category    VARCHAR(100)   NOT NULL,
+        description VARCHAR(1000),
+        created_at  TIMESTAMP      NOT NULL,
+        updated_at TIMESTAMP,
+        is_active   BOOLEAN        NOT NULL DEFAULT true,
+        CONSTRAINT pk_products_part PRIMARY KEY (id, category)
+      ) PARTITION BY LIST (category);
+
+      -- Electronics partition
+      CREATE TABLE products_electronics PARTITION OF products
+        FOR VALUES IN
+      (
+        'ELECTRONICS'
+      );
+
+      -- Books partition
+      CREATE TABLE products_books PARTITION OF products
+        FOR VALUES IN
+      (
+        'BOOKS'
+      );
+
+      -- Food partition
+      CREATE TABLE products_food PARTITION OF products
+        FOR VALUES IN
+      (
+        'FOOD'
+      );
+
+      -- Others partition (default)
+      CREATE TABLE products_others PARTITION OF products
+        FOR VALUES IN
+      (
+        'OTHERS'
+      );
+
+      -- Eski ma'lumotlarni yangi jadvalga ko'chirish
+      INSERT INTO products(id, name, price, category, description, created_at, updated_at,
+                           is_active)
+      SELECT id,
+             name,
+             price,
+             category,
+             description,
+             created_at,
+             updated_at,
+             is_active
+      FROM products_old
+      WHERE category IN ('ELECTRONICS', 'BOOKS', 'FOOD', 'OTHERS');
+
+      -- Har bir partition uchun alohida indexlar
+      CREATE INDEX idx_products_electronics_name ON products_electronics (name);
+
+      CREATE INDEX idx_products_books_name ON products_books (name);
+
+      CREATE INDEX idx_products_food_name ON products_food (name);
+
+      CREATE INDEX idx_products_others_name ON products_others (name);
+    </sql>
+  </changeSet>
+
+</databaseChangeLog>

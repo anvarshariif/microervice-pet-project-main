@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: order
+  liquibase:
+    change-log: classpath:liquibase/master.xml
+    enabled: true
+    drop-first: false
+    default-schema: public
+    liquibase-schema: public
+  datasource:
+    url: jdbc:postgresql://localhost:5432/order_db
+    username: postgres
+    password: root123
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+  kafka:
+    bootstrap-servers: localhost:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    properties:
+      spring.json.trusted.packages: "*"
+      spring.json.use.type.headers: false
+
+server:
+  port: 8082
+
+logging:
+  level:
+    liquibase: DEBUG
+    org.hibernate.SQL: DEBUG

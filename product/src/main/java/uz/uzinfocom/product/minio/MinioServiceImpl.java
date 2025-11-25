@@ -64,7 +64,7 @@ public class MinioServiceImpl implements MinioService {
   }
 
   @Override
-  public String uploadFile(MultipartFile file, String objectName) {
+  public void uploadFile(MultipartFile file, String objectName) {
     try {
       // Bucket mavjudligini tekshirish
       String bucketName = minioProperties.getBucketName();
@@ -83,7 +83,6 @@ public class MinioServiceImpl implements MinioService {
       );
 
       log.info("File uploaded successfully: {}", objectName);
-      return objectName;
 
     } catch (Exception e) {
       log.error("Error uploading file: {}", objectName, e);

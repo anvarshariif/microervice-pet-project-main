@@ -1,5 +1,6 @@
 package uz.uzinfocom.product.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,9 @@ public class ProductResponseDto {
   private BigDecimal price;
   private String category;
   private String description;
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
   private LocalDateTime createdAt;
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
   private LocalDateTime updatedAt;
   private Boolean isActive;
   private String imageName;

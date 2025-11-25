@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -46,10 +48,10 @@ public class ProductServiceImpl implements ProductService{
     return mapToResponseDto(savedProduct);
   }
 
+  @Cacheable(value = "products", key = "#id")
   @Override
   public ProductResponseDto getProductById(Long id) {
     log.info("Fetching product with ID: {}", id);
-
     ProductEntity product = productRepository.findByIdAndActive(id)
         .orElseThrow(() -> new RuntimeException("Product not found with ID: " + id));
 
@@ -74,6 +76,7 @@ public class ProductServiceImpl implements ProductService{
     return products.map(this::mapToResponseDto);
   }
 
+  @CacheEvict(value = "products", key = "#id")
   @Override
   @Transactional
   public ProductResponseDto updateProduct(Long id, ProductRequestDto requestDto) {
@@ -93,6 +96,7 @@ public class ProductServiceImpl implements ProductService{
     return mapToResponseDto(updatedProduct);
   }
 
+  @CacheEvict(value = "products", key = "#id")
   @Override
   @Transactional
   public void deleteProduct(Long id) {
@@ -107,6 +111,8 @@ public class ProductServiceImpl implements ProductService{
 
     log.info("Product deleted successfully with ID: {}", id);
   }
+
+  @CacheEvict(value = "products", key = "#productId")
   @Override
   @Transactional
   public ProductResponseDto uploadProductImage(Long productId, MultipartFile file) {
@@ -162,6 +168,7 @@ public class ProductServiceImpl implements ProductService{
     return minioService.getFile(productEntity.getImageName());
   }
 
+  @CacheEvict(value = "products", key = "#productId")
   @Override
   @Transactional
   public void deleteProductImage(Long productId) {

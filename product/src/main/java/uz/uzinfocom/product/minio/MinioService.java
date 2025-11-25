@@ -9,7 +9,7 @@ public interface MinioService {
 
   boolean bucketExists(String bucketName);
 
-  String uploadFile(MultipartFile file, String objectName);
+  void uploadFile(MultipartFile file, String objectName);
 
   InputStream getFile(String objectName);
 
